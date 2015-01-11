@@ -1,0 +1,16 @@
+# [function].ps1
+# [What the function does]
+#
+# Jan 2015
+# If this works, this was written by Victor Vogelpoel (victor@victorvogelpoel.nl)
+# If it doesn't work, I don't know who wrote this.
+
+function func
+{
+	[CmdletBinding()]
+	param
+	( 
+	)
+
+	
+}

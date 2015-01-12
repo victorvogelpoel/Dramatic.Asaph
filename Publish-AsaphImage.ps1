@@ -1,3 +1,19 @@
+# Publish-AsaphImage.ps1
+# Post an image to the Asaph site.
+# Jan 2015
+# If this works, this was written by Victor Vogelpoel (victor@victorvogelpoel.nl)
+# If it doesn't work, I don't know who wrote this.
+#
+# This program is free software; you can redistribute it and/or modify it under the terms 
+# of the GNU General Public License as published by the Free Software Foundation; either 
+# version 2 of the License, or (at your option) any later version.
+# This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
+# without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License along with this program; 
+# if not, write to the Free Software Foundation, Inc., 
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
 
@@ -46,11 +62,11 @@ function Publish-AsaphImage
     $session.Cookies = $cc  
 
     $asaphItemParams = @{
-        'xhrLocation' = ''
-        'title' = $ImageTitle
-        'image' = $ImageUrl
-        'referer' = $ImageSiteUrl
-        'post' = 'post'
+        'xhrLocation'	= ''
+        'title' 		= $ImageTitle
+        'image' 		= $ImageUrl
+        'referer' 		= $ImageSiteUrl
+        'post' 			= 'post'
     }
 
     try
@@ -61,18 +77,18 @@ function Publish-AsaphImage
         if ($response)
         {
             $result = [PSCustomObject]@{
-                'ImageTitle' = $ImageTitle
-                'ImageUrl' = $ImageUrl
-                'ImageSiteUrl' = $ImageSiteUrl
-                'PublishResult' = [AsaphPublishResult]::SuccessImageIsPosted
+                'ImageTitle' 	= $ImageTitle
+                'ImageUrl' 		= $ImageUrl
+                'ImageSiteUrl' 	= $ImageSiteUrl
+                'PublishResult'	= [AsaphPublishResult]::SuccessImageIsPosted
             }
 
             switch -wildcard ($response.Content)
             {
 
-                '*Asaph_PostSuccess*' { Write-Verbose "Image was posted!"; $result.PublishResult = 'SuccessImageIsPosted'; break }
+                '*Asaph_PostSuccess*' 				{ Write-Verbose "Image was posted!"; $result.PublishResult = 'SuccessImageIsPosted'; break }
 
-                '*This image was already posted!*' { Write-Verbose 'Image was already posted!'; $result.PublishResult = 'SuccessImageWasAlreadyPosted' ;break }
+                '*This image was already posted!*'	{ Write-Verbose 'Image was already posted!'; $result.PublishResult = 'SuccessImageWasAlreadyPosted' ;break }
 
                 '*Couldn''t load the image!*'
                 {
@@ -90,7 +106,7 @@ function Publish-AsaphImage
                      Break
                 }
 
-                default { $result.PublishResult = 'FailUnknownError'; break }
+                default 							{ $result.PublishResult = 'FailUnknownError'; break }
             }
 
             Write-Output $result

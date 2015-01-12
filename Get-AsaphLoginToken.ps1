@@ -34,9 +34,9 @@ function Get-AsaphLoginToken
         # The $script:AsaphLoginTokens should contain exactly 1 token.
         switch ($script:AsaphLoginTokens.Count)
         {
-            0 { throw 'No Asaph sites are connected. Please use Connect-Asaph to logon to Asaph first.'; break }
-            1 { $script:AsaphLoginTokens.Values[0].ToString(); break}
-            default { throw 'Multiple Asaph sites are connected. Please specify the Asaph URL.'; break }
+            0		{ throw 'No Asaph sites are connected. Please use Connect-Asaph to logon to Asaph first.'; break }
+            1		{ $script:AsaphLoginTokens.Values[0].ToString(); break}
+            default	{ throw 'Multiple Asaph sites are connected. Please specify the Asaph URL.'; break }
         }
     }
 }

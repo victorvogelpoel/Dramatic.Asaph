@@ -21,26 +21,26 @@ function Connect-Asaph
     [CmdletBinding(DefaultParameterSetName='Credential')]
     param
     (
-        [Parameter(Mandatory=$true, position=0, ParameterSetName='Credential')]
-        [Parameter(Mandatory=$true, position=0, ParameterSetName='Token')]
+        [Parameter(Mandatory=$true, position=0, ParameterSetName='Credential', helpmessage=' The URL of the Asaph site.')]
+        [Parameter(Mandatory=$true, position=0, ParameterSetName='Token', helpmessage=' The URL of the Asaph site.')]
         [ValidateNotNull()]
         [Alias('Url')]
         [Uri]$AsaphUrl,
 
-        [Parameter(Mandatory=$true, position=1, ParameterSetName='Credential')]
+        [Parameter(Mandatory=$true, position=1, ParameterSetName='Credential', helpmessage='PSCredential to use to log into the Asaph site.')]
         [ValidateNotNull()]
         [PSCredential]$Credential,
 
-        [Parameter(Mandatory=$true, position=1, ParameterSetName='Token')]
+        [Parameter(Mandatory=$true, position=1, ParameterSetName='Token', helpmessage='Login token to use to log into the Asaph site.')]
         [ValidateNotNullOrEmpty()]
         [Alias('Token', 'LogonToken')]
         [string]$AsaphLoginToken,
 
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$false, helpmessage='Return the logon token. For example, you may wish to store the login token for later use.')]
         [switch]$Passthru
     )
 
-    $asaphUrlText = $($AsaphUrl.ToString().TrimEnd('/', ' '))
+    $asaphUrlText  = $($AsaphUrl.ToString().TrimEnd('/', ' '))
     $asaphAdminUri = [Uri]"$asaphUrlText/admin/"
 
     if ($PSCmdlet.ParameterSetName -eq 'Credential')
@@ -62,7 +62,7 @@ function Connect-Asaph
             throw "Site at `"$AsaphUrl`" is not Asaph or cannot access Asaph admin page."
         }
 
-        $form = $response.Forms[0]
+        $form                = $response.Forms[0]
         $form.Fields['name'] = $Credential.Username
         $form.Fields['pass'] = $Credential.GetNetworkCredential().Password
     
@@ -81,8 +81,7 @@ function Connect-Asaph
         }
 
         $script:AsaphLoginTokens[$asaphUrlText] = $asaphLoginTokenFromCookie
-
-        $AsaphLoginToken = $asaphLoginTokenFromCookie
+        $AsaphLoginToken                        = $asaphLoginTokenFromCookie
     }
     else
     {
@@ -91,15 +90,14 @@ function Connect-Asaph
         $loginCookie   = New-Object System.Net.Cookie('asaphAdmin', $AsaphLoginToken, $asaphPostUri.AbsolutePath, $asaphPostUri.Host)
 
         # Now prepare the login cookie for the request
-        $cc = New-Object System.Net.CookieContainer 
-        $session = New-Object Microsoft.PowerShell.Commands.WebRequestSession  
+        $cc            = New-Object System.Net.CookieContainer 
+        $session       = New-Object Microsoft.PowerShell.Commands.WebRequestSession  
         $cc.Add($loginCookie)
         $session.Cookies = $cc  
 
         try
         {
             $response = Invoke-WebRequest -Uri $asaphAdminUri -WebSession $session
-
         }
         catch
         {
@@ -118,4 +116,48 @@ function Connect-Asaph
     {
         Write-Output $AsaphLoginToken
     }
+
+
+<#
+.SYNOPSIS
+    Login to an Asaph site using the specified credentials or login token.
+
+.DESCRIPTION
+    Connect-Asaph logs into the specified Asaph site with the specified credentials.
+    The Asaph site Url and logon token is cached in memory in the module. Publish-AsaphImage uses
+    this logon token when posting an image to the Asaph site.
+
+.PARAMETER AsaphUrl
+    The URL of the Asaph site.
+
+.PARAMETER Credential
+    PSCredential to use to log into the Asaph site.
+
+.PARAMETER AsaphLoginToken
+    Login token to use to log into the Asaph site.
+    You may have saved the token from an earlier session and want to reuse it.
+
+.PARAMETER Passthru
+    Return the logon token. For example, you may wish to store the login token
+    for later use.
+
+.EXAMPLE
+    Connect-Asaph -AsaphUrl 'http://domain.com/asaph' -Credential (Get-Credential)
+
+    Asks for credentials and uses this to log into the Asaph site at http://domain.com/asaph.
+
+.EXAMPLE
+    Connect-Asaph -AsaphUrl 'http://domain.com/asaph' -AsaphLoginToken '0b6cb84e0680d78bd63832c668560c0b'
+
+    Log in to http://domain.com/asaph with login token '0b6cb84e0680d78bd63832c668560c0b'.
+
+.NOTES
+   Each time you use Connect-Asaph with credentials to log into an Asaph site, Asaph calculates 
+   a new logon token, which is returned in a cookie. This token is each time different.
+
+.LINK
+    Publish-AsaphImage
+#>
+
+
 }

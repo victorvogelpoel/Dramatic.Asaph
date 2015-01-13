@@ -35,7 +35,7 @@ function Get-AsaphLoginToken
         switch ($script:AsaphLoginTokens.Count)
         {
             0		{ throw 'No Asaph sites are connected. Please use Connect-Asaph to logon to Asaph first.'; break }
-            1		{ $script:AsaphLoginTokens.Values[0].ToString(); break}
+            1		{ $script:AsaphLoginTokens.Values[0]; break}
             default	{ throw 'Multiple Asaph sites are connected. Please specify the Asaph URL.'; break }
         }
     }

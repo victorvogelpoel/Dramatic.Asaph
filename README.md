@@ -16,10 +16,7 @@ You should have received a copy of the GNU General Public License along with thi
 **IMPORTANT: This module is still under development.**
 
 ### TODO ###
-- Create Help text
-- Create Examples 
 - Implement Publish-AsaphSite
-
 
 
 ### Asaph? ###
@@ -37,16 +34,19 @@ It's short for Dramatic Development, my coding brand.
 
 
 ## Installation ##
-1. In directory "~\Documents" (C:\Users\[YOURACCOUNT]\Documents), create a folder "WindowsPowerShell" if it is not there already.
+Copy the files into directory "~\WindowsPowerShell\Modules\Dramatic.Asaph". You may need to create the directory first: 
+
+1. In directory "~\Documents" (C:\Users\\[YOURACCOUNT]\Documents), create a folder "WindowsPowerShell", if it is not there already.
 2. In directory "~\Documents\WindowsPowerShell", create folder "Modules", if it is not there already.
-3. In directory "~\Documents\WindowsPowerShell\Modules\", copy the module folder "Dramatic.Asaph" with all its containing files.
+3. In directory "~\Documents\WindowsPowerShell\Modules\", create directory "Dramatic.Asaph". 
+4. Copy the files from this GIT repository to folder "~\Documents\WindowsPowerShell\Modules\Dramatic.Asaph".
 
 
 ## Features ##
 - Logging in to an Asaph site with specified credentials: **Connect-Asaph**.
 - Logging in to multiple Asaph sites; the module registers and caches the logon tokens in memory.
 -  Publishing an image (eg giving Asaph an image url to download); Asaph will download the image from the image url and register it: **Publish-AsaphImage**. 
-- Publish-AsaphImage returns the result of the publish action: SuccessImageIsPosted, SuccessImageWasAlreadyPosted, FailCouldntLoadTheImage, FailCouldntCreateThumbnailOfImage or FailUnknownError
+- Publish-AsaphImage returns the (enum) result of the publish action: SuccessImageIsPosted, SuccessImageWasAlreadyPosted, FailCouldntLoadTheImage, FailCouldntCreateThumbnailOfImage or FailUnknownError
 -  Handles both http and https image urls.
 -  Limitation: image url must be accessible without the need of logging on the source site.
  
@@ -54,16 +54,17 @@ It's short for Dramatic Development, my coding brand.
 
 ## Usage ##
     
-	# Advise: create a separate user account in Asaph administration pages first, 
+	# Advise: create a separate user account in Asaph web administration first, 
 	# which is to be used by this script below (for example: user "PowerShellbot").
 	# Enter these credentials when Get-Credentials below asks for it. 
 
+	# load the module
 	Import-Module 'Dramatic.Asaph'
 	
-	# The Asaph site 
+	# This is the Asaph site (do not specify "/admin"!) 
 	$asaphUrl = 'http://domain.com/asaph'
 
-	# Ask credentials for Asaph; enter the credential for the separate user account,
+	# Ask credentials for Asaph; enter the credential for the separate user account.
 	$credentials = Get-Credentials
 
 	# Login to the Asaph site with the credentials

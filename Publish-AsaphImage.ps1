@@ -16,7 +16,6 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-
 function Publish-AsaphImage
 {
     [CmdletBinding()]
@@ -42,22 +41,22 @@ function Publish-AsaphImage
     #Assert-AsaphLoggedOn -AsaphUrl $AsaphUrl
 
     # Get the Logon token from the local cache
-    $logonToken = Get-AsaphLoginToken -AsaphUrl $AsaphUrl
+    $logonToken 	= Get-AsaphLoginToken -AsaphUrl $AsaphUrl
 
     if ($null -eq $AsaphUrl)
     {
-        $AsaphUrl = [Uri]($script:AsaphLoginTokens.Keys[0]).ToString()
+        $AsaphUrl 	= [Uri]($script:AsaphLoginTokens.Keys[0]).ToString()
     }
 
-    $AsaphUrlText  = $AsaphUrl.ToString().TrimEnd('/', ' ')
-    $asaphAdminUri = [Uri]"$AsaphUrlText/admin"
-    $asaphPostUri  = [Uri]"$AsaphUrlText/admin/post.php"
+    $AsaphUrlText 	= $AsaphUrl.ToString().TrimEnd('/', ' ')
+    $asaphAdminUri	= [Uri]"$AsaphUrlText/admin"
+    $asaphPostUri	= [Uri]"$AsaphUrlText/admin/post.php"
 
-    $loginCookie   = New-Object System.Net.Cookie('asaphAdmin', $logonToken, $asaphPostUri.AbsolutePath, $asaphPostUri.Host)
+    $loginCookie	= New-Object System.Net.Cookie('asaphAdmin', $logonToken, $asaphPostUri.AbsolutePath, $asaphPostUri.Host)
 
     # Now prepare the login cookie for the request
-    $cc = New-Object System.Net.CookieContainer 
-    $session = New-Object Microsoft.PowerShell.Commands.WebRequestSession  
+    $cc				= New-Object System.Net.CookieContainer 
+    $session 		= New-Object Microsoft.PowerShell.Commands.WebRequestSession  
     $cc.Add($loginCookie)
     $session.Cookies = $cc  
 
@@ -77,7 +76,7 @@ function Publish-AsaphImage
         if ($response)
         {
             $result = [PSCustomObject]@{
-                'ImageTitle' 	= $ImageTitle
+                'ImageTitle'	= $ImageTitle
                 'ImageUrl' 		= $ImageUrl
                 'ImageSiteUrl' 	= $ImageSiteUrl
                 'PublishResult'	= [AsaphPublishResult]::SuccessImageIsPosted

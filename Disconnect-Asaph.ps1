@@ -26,8 +26,8 @@ function Disconnect-Asaph
         [Uri]$AsaphUrl
     )
 
-    $asaphUrlText = $AsaphUrl.ToString().TrimEnd('/', ' ')
-    $asaphAdminUri = [Uri]"$asaphUrlText/admin/"
+    $asaphUrlText	= $AsaphUrl.ToString().TrimEnd('/', ' ')
+    $asaphAdminUri	= [Uri]"$asaphUrlText/admin/"
 
     # Remove the cached token for the specified site
     $script:AsaphLoginTokens.Remove($asaphUrlText)

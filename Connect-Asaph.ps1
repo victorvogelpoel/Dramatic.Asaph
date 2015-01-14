@@ -40,8 +40,8 @@ function Connect-Asaph
         [switch]$Passthru
     )
 
-    $asaphUrlText  = $($AsaphUrl.ToString().TrimEnd('/', ' '))
-    $asaphAdminUri = [Uri]"$asaphUrlText/admin/"
+    $asaphUrlText	= $($AsaphUrl.ToString().TrimEnd('/', ' '))
+    $asaphAdminUri	= [Uri]"$asaphUrlText/admin/"
 
     if ($PSCmdlet.ParameterSetName -eq 'Credential')
     {
@@ -62,12 +62,12 @@ function Connect-Asaph
             throw "Site at `"$AsaphUrl`" is not Asaph or cannot access Asaph admin page."
         }
 
-        $form                = $response.Forms[0]
-        $form.Fields['name'] = $Credential.Username
-        $form.Fields['pass'] = $Credential.GetNetworkCredential().Password
+        $form              		= $response.Forms[0]
+        $form.Fields['name']	= $Credential.Username
+        $form.Fields['pass']	= $Credential.GetNetworkCredential().Password
     
         Write-Verbose "Posting username and password to `"$asaphAdminUri`"..."
-        $response = Invoke-WebRequest -Uri $asaphAdminUri -WebSession $loginsession -Method Post -Body $form.Fields
+        $response 				= Invoke-WebRequest -Uri $asaphAdminUri -WebSession $loginsession -Method Post -Body $form.Fields
 
         if ($null -eq $response -or $response.StatusCode -ne 200 -or $response.content -like '*The name or password was not correct!*')
         {
@@ -80,18 +80,18 @@ function Connect-Asaph
             throw "Missing logon token cookie in logon response at Asaph site $asaphUrlText"
         }
 
-        $script:AsaphLoginTokens[$asaphUrlText] = $asaphLoginTokenFromCookie
+        $script:AsaphLoginTokens[$asaphUrlText]	= $asaphLoginTokenFromCookie
         $AsaphLoginToken                        = $asaphLoginTokenFromCookie
     }
     else
     {
         # A token was specified. Ensure validity.
 
-        $loginCookie   = New-Object System.Net.Cookie('asaphAdmin', $AsaphLoginToken, $asaphPostUri.AbsolutePath, $asaphPostUri.Host)
+        $loginCookie	= New-Object System.Net.Cookie('asaphAdmin', $AsaphLoginToken, $asaphPostUri.AbsolutePath, $asaphPostUri.Host)
 
         # Now prepare the login cookie for the request
-        $cc            = New-Object System.Net.CookieContainer 
-        $session       = New-Object Microsoft.PowerShell.Commands.WebRequestSession  
+        $cc				= New-Object System.Net.CookieContainer 
+        $session		= New-Object Microsoft.PowerShell.Commands.WebRequestSession  
         $cc.Add($loginCookie)
         $session.Cookies = $cc  
 
@@ -109,6 +109,7 @@ function Connect-Asaph
             throw "Failed to login into Asaph with specified logon token; please log on with credentials (instead of token)."
         }
 
+		# Cache the token in memory
         $script:AsaphLoginTokens[$asaphUrlText] = $AsaphLoginToken
     }
 

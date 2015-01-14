@@ -30,16 +30,16 @@ Asaph has no API, so this PowerShell module requests, scrapes and posts the Asap
 I collect great images from photo sites and use various devices and apps to visit these sites. The Asaph picker can only be used on a PC; sometimes mailing myself the url of the photo page is the only thing I can resort to on other devices. An automated workflow enables me to read the photo page urls from my mail box and use the module's **Publish-AsaphImage** to register the photo into my Asaph sites.
 
 ### "Dramatic"? ###
-It's short for Dramatic Development, my coding brand.
+It's short for *Dramatic Development*, my coding brand.
 
 
 ## Installation ##
-Copy the files into directory "~\WindowsPowerShell\Modules\Dramatic.Asaph". You may need to create the directory first: 
+Copy the files into directory "**%userprofile%\Documents\WindowsPowerShell\Modules\Dramatic.Asaph**". You may need to create the directory first: 
 
-1. In directory "~\Documents" (C:\Users\\[YOURACCOUNT]\Documents), create a folder "WindowsPowerShell", if it is not there already.
-2. In directory "~\Documents\WindowsPowerShell", create folder "Modules", if it is not there already.
-3. In directory "~\Documents\WindowsPowerShell\Modules\", create directory "Dramatic.Asaph". 
-4. Copy the files from this GIT repository to folder "~\Documents\WindowsPowerShell\Modules\Dramatic.Asaph".
+1. In directory "%userprofile%\Documents\" (C:\Users\\[YOURACCOUNT]\Documents), create a folder "WindowsPowerShell", if it is not there already.
+2. In directory "%userprofile%\Documents\WindowsPowerShell", create folder "Modules", if it is not there already.
+3. In directory "%userprofile%\Documents\WindowsPowerShell\Modules\", create directory "Dramatic.Asaph". 
+4. Copy the files from this GIT repository to folder "%userprofile%\Documents\WindowsPowerShell\Modules\Dramatic.Asaph".
 
 
 ## Features ##
@@ -73,6 +73,8 @@ Copy the files into directory "~\WindowsPowerShell\Modules\Dramatic.Asaph". You 
 	# Publish the specified image url to Asaph...
     # Asaph will download the image and register it.
 	Publish-AsaphImage -ImageUrl 'http://fc03.deviantart.net/fs71/i/2013/054/7/d/about_the_girl_with_eyes_made_of_fire_by_laurazalenga-d5vpohz.jpg' -ImageTitle 'Test' -ImageSiteUrl '' -AsaphUrl $AsaphUrl
+	
+	
 
 The Publish-Image cmdlet returns a custom object designating the publish result; in the following example two images were posted while the second had already been posted:
 

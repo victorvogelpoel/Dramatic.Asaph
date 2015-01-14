@@ -19,7 +19,7 @@ LONG DESCRIPTION
 
 	Download
 
-	Current Version: Download Asaph 1.0 — ZIP ~50kb at http://phoboslab.org/files/asaph/asaph-v1.0.zip
+	Current Version: Download Asaph 1.0 ZIP ~50kb at http://phoboslab.org/files/asaph/asaph-v1.0.zip
 	Source: github.com/phoboslab/Asaph
 
 	Requirements & Installation

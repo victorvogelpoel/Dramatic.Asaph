@@ -34,12 +34,9 @@ It's short for *Dramatic Development*, my coding brand.
 
 
 ## Installation ##
-Copy the files into directory "**%userprofile%\Documents\WindowsPowerShell\Modules\Dramatic.Asaph**". You may need to create the directory first: 
+Open a PowerShell command box and run the following command to install this module straight from the GitHub repository to the WindowsPowerShell\Modules folder in the MyDocuments of your Windows user profile:
 
-1. In directory "%userprofile%\Documents\" (C:\Users\\[YOURACCOUNT]\Documents), create a folder "WindowsPowerShell", if it is not there already.
-2. In directory "%userprofile%\Documents\WindowsPowerShell", create folder "Modules", if it is not there already.
-3. In directory "%userprofile%\Documents\WindowsPowerShell\Modules\", create directory "Dramatic.Asaph". 
-4. Copy the files from this GIT repository to folder "%userprofile%\Documents\WindowsPowerShell\Modules\Dramatic.Asaph".
+    iex (New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/victorvogelpoel/Dramatic.Asaph/master/install.ps1')
 
 
 ## Features ##

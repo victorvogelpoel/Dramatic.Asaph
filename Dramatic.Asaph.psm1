@@ -48,6 +48,7 @@ Add-Type -TypeDefinition @"
 #----------------------------------------------------------------------------------------------------------------------
 # Dot source any related scripts and functions in the same directory as this module
 $ignoreCommandsForDotSourcing = @(
+	'install.ps1'
 )
 
 Get-ChildItem $script:thisModuleDirectory\*.ps1 | foreach { 

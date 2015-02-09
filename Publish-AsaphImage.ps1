@@ -45,7 +45,7 @@ function Publish-AsaphImage
 
     if ($null -eq $AsaphUrl)
     {
-        $AsaphUrl 	= [Uri]($script:AsaphLoginTokens.Keys[0]).ToString()
+        $AsaphUrl 	= [Uri][string]($script:AsaphLoginTokens.Keys[0])
     }
 
     $AsaphUrlText 	= $AsaphUrl.ToString().TrimEnd('/', ' ')

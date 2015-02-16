@@ -74,7 +74,8 @@ function Connect-Asaph
             throw "Incorrect name or password while attempting logging on to Asaph site at `"$asaphUrlText`""
         }
 
-        $asaphLoginTokenFromCookie = $loginsession.Cookies.GetCookies($asaphAdminUri)['asaphAdmin'].Value
+        $cookieName = "$($AsaphUrl.Segments | select -Last 1)Admin"  # get the directory name of the asaph installation, which is the cookieName + "Admin"
+        $asaphLoginTokenFromCookie = $loginsession.Cookies.GetCookies($asaphAdminUri)[$cookieName].Value
         if ($null -eq $asaphLoginTokenFromCookie)
         {
             throw "Missing logon token cookie in logon response at Asaph site $asaphUrlText"

@@ -40,6 +40,7 @@ Add-Type -TypeDefinition @"
       SuccessImageWasAlreadyPosted,
       FailCouldntLoadTheImage,
       FailCouldntCreateThumbnailOfImage,
+      FailNameOrPasswordWasNotCorrect,
       FailUnknownError
    }
 "@

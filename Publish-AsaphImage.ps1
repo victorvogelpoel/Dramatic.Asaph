@@ -52,7 +52,8 @@ function Publish-AsaphImage
     $asaphAdminUri	= [Uri]"$AsaphUrlText/admin"
     $asaphPostUri	= [Uri]"$AsaphUrlText/admin/post.php"
 
-    $loginCookie	= New-Object System.Net.Cookie('asaphAdmin', $logonToken, $asaphPostUri.AbsolutePath, $asaphPostUri.Host)
+    $cookieName = "$($AsaphUrl.Segments | select -Last 1)Admin"  # get the directory name of the asaph installation, which is the cookieName + "Admin"
+    $loginCookie	= New-Object System.Net.Cookie($cookieName, $logonToken, $asaphPostUri.AbsolutePath, $asaphPostUri.Host)
 
     # Now prepare the login cookie for the request
     $cc				= New-Object System.Net.CookieContainer 
@@ -105,7 +106,14 @@ function Publish-AsaphImage
                      Break
                 }
 
-                default 							{ $result.PublishResult = 'FailUnknownError'; break }
+                '*The name or password was not correct!*'
+                {
+                    Write-Verbose 'The name or password was not correct!'
+                    $result.PublishResult = 'FailNameOrPasswordWasNotCorrect'
+                    break
+                }
+
+                default { $result.PublishResult = 'FailUnknownError'; break }
             }
 
             Write-Output $result

@@ -21,113 +21,117 @@ function Publish-AsaphImage
     [CmdletBinding()]
     param
     (
-        [Parameter(Mandatory=$true, position=0, helpmessage='Url of the image to be posted')]
+        [Parameter(Mandatory=$true, position=0, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, helpmessage='Url of the image to be posted')]
         [ValidateNotNullOrEmpty()]
+        [Alias('PhotoUrl')]
         [Uri]$ImageUrl,
 
-        [Parameter(Mandatory=$false, position=1, helpmessage='Title of the image to be posted')]
+        [Parameter(Mandatory=$false, position=1, ValueFromPipelineByPropertyName=$true, helpmessage='Title of the image to be posted')]
         [ValidateNotNull()]
+        [Alias('PhotoTitle', 'Title')]
         [String]$ImageTitle= '',
 
-        [Parameter(Mandatory=$false, position=2, helpmessage='Url of the page or site where the image was found.')]
-        [Alias('Referer')]
+        [Parameter(Mandatory=$false, position=2, ValueFromPipelineByPropertyName=$true, helpmessage='Url of the page or site where the image was found.')]
+        [Alias('PhotoSiteUrl', 'Referer', 'SiteUrl')]
         [String]$ImageSiteUrl = '',
 
-        [Parameter(Mandatory=$false, position=3, helpmessage='Url of the Asaph site to post the image to. If you are connected to more than one Asaph site, specify the Asaph URL. If connected to only one Asaph site, you don''t have to specify the Asaph URL.')]
+        [Parameter(Mandatory=$false, position=3, ValueFromPipelineByPropertyName=$true, helpmessage='Url of the Asaph site to post the image to.')]
         [Uri]$AsaphUrl
     )
 
-    # Make sure we're logged on to the Asaph site; Connect-Asaph must have been used
-    #Assert-AsaphLoggedOn -AsaphUrl $AsaphUrl
-
-    # Get the Logon token from the local cache
-    $logonToken 	= Get-AsaphLoginToken -AsaphUrl $AsaphUrl
-
-    if ($null -eq $AsaphUrl)
+    process
     {
-        $AsaphUrl 	= [Uri][string]($script:AsaphLoginTokens.Keys[0])
-    }
+        # Make sure we're logged on to the Asaph site; Connect-Asaph must have been used
+        #Assert-AsaphLoggedOn -AsaphUrl $AsaphUrl
 
-    $AsaphUrlText 	= $AsaphUrl.ToString().TrimEnd('/', ' ')
-    $asaphAdminUri	= [Uri]"$AsaphUrlText/admin"
-    $asaphPostUri	= [Uri]"$AsaphUrlText/admin/post.php"
+        # Get the Logon token from the local cache
+        $logonToken 	= Get-AsaphLoginToken -AsaphUrl $AsaphUrl
 
-    $cookieName = "$($AsaphUrl.Segments | select -Last 1)Admin"  # get the directory name of the asaph installation, which is the cookieName + "Admin"
-    $loginCookie	= New-Object System.Net.Cookie($cookieName, $logonToken, $asaphPostUri.AbsolutePath, $asaphPostUri.Host)
-
-    # Now prepare the login cookie for the request
-    $cc				= New-Object System.Net.CookieContainer 
-    $session 		= New-Object Microsoft.PowerShell.Commands.WebRequestSession  
-    $cc.Add($loginCookie)
-    $session.Cookies = $cc  
-
-    $asaphItemParams = @{
-        'xhrLocation'	= ''
-        'title' 		= $ImageTitle
-        'image' 		= $ImageUrl
-        'referer' 		= $ImageSiteUrl
-        'post' 			= 'post'
-    }
-
-    try
-    {
-        # Invoke the publish image command on Asaph
-        Write-Verbose "Posting the image to the Asaph site..."
-        $response = Invoke-WebRequest -Uri $asaphPostUri -WebSession $session -Method Post -Body $asaphItemParams
-        if ($response)
+        if ($null -eq $AsaphUrl)
         {
-            $result = [PSCustomObject]@{
-                'ImageTitle'	= $ImageTitle
-                'ImageUrl' 		= $ImageUrl
-                'ImageSiteUrl' 	= $ImageSiteUrl
-                'PublishResult'	= [AsaphPublishResult]::SuccessImageIsPosted
-            }
+            $AsaphUrl 	= [Uri][string]($script:AsaphLoginTokens.Keys[0])
+        }
 
-            switch -wildcard ($response.Content)
+        $AsaphUrlText 	= $AsaphUrl.ToString().TrimEnd('/', ' ')
+        $asaphAdminUri	= [Uri]"$AsaphUrlText/admin"
+        $asaphPostUri	= [Uri]"$AsaphUrlText/admin/post.php"
+
+        $cookieName = "$($AsaphUrl.Segments | select -Last 1)Admin"  # get the directory name of the asaph installation, which is the cookieName + "Admin"
+        $loginCookie	= New-Object System.Net.Cookie($cookieName, $logonToken, $asaphPostUri.AbsolutePath, $asaphPostUri.Host)
+
+        # Now prepare the login cookie for the request
+        $cc				= New-Object System.Net.CookieContainer 
+        $session 		= New-Object Microsoft.PowerShell.Commands.WebRequestSession  
+        $cc.Add($loginCookie)
+        $session.Cookies = $cc  
+
+        $asaphItemParams = @{
+            'xhrLocation'	= ''
+            'title' 		= $ImageTitle
+            'image' 		= $ImageUrl
+            'referer' 		= $ImageSiteUrl
+            'post' 			= 'post'
+        }
+
+        try
+        {
+            # Invoke the publish image command on Asaph
+            Write-Verbose "Posting the image to the Asaph site..."
+            $response = Invoke-WebRequest -Uri $asaphPostUri -WebSession $session -Method Post -Body $asaphItemParams
+            if ($response)
             {
-
-                '*Asaph_PostSuccess*' 				{ Write-Verbose "Image was posted!"; $result.PublishResult = 'SuccessImageIsPosted'; break }
-
-                '*This image was already posted!*'	{ Write-Verbose 'Image was already posted!'; $result.PublishResult = 'SuccessImageWasAlreadyPosted' ;break }
-
-                '*Couldn''t load the image!*'
-                {
-                    Write-Verbose 'Couldn''t load the image!'
-                    $result.PublishResult = 'FailCouldntLoadTheImage'
-                    # throw "Failed to publish image `"$ImageUrl`"; Asaph couldn't load the image from its source."
-                    Break
+                $result = [PSCustomObject]@{
+                    'ImageTitle'	= $ImageTitle
+                    'ImageUrl' 		= $ImageUrl
+                    'ImageSiteUrl' 	= $ImageSiteUrl
+                    'PublishResult'	= [AsaphPublishResult]::SuccessImageIsPosted
                 }
 
-                '*Couldn''t create a thumbnail of the image!*'
+                switch -wildcard ($response.Content)
                 {
-                     Write-Verbose 'Couldn''t load the image!'
-                     $result.PublishResult = 'FailCouldntCreateThumbnailOfImage'
-                     #throw "Failed to publish image `"$ImageUrl`"; Asaph could load the image from its source, but couldn''t create a thumbnail of the image!."
-                     Break
+
+                    '*Asaph_PostSuccess*' 				{ Write-Verbose "Image was posted!"; $result.PublishResult = 'SuccessImageIsPosted'; break }
+
+                    '*This image was already posted!*'	{ Write-Verbose 'Image was already posted!'; $result.PublishResult = 'SuccessImageWasAlreadyPosted' ;break }
+
+                    '*Couldn''t load the image!*'
+                    {
+                        Write-Verbose 'Couldn''t load the image!'
+                        $result.PublishResult = 'FailCouldntLoadTheImage'
+                        # throw "Failed to publish image `"$ImageUrl`"; Asaph couldn't load the image from its source."
+                        Break
+                    }
+
+                    '*Couldn''t create a thumbnail of the image!*'
+                    {
+                         Write-Verbose 'Couldn''t load the image!'
+                         $result.PublishResult = 'FailCouldntCreateThumbnailOfImage'
+                         #throw "Failed to publish image `"$ImageUrl`"; Asaph could load the image from its source, but couldn''t create a thumbnail of the image!."
+                         Break
+                    }
+
+                    '*The name or password was not correct!*'
+                    {
+                        Write-Verbose 'The name or password was not correct!'
+                        $result.PublishResult = 'FailNameOrPasswordWasNotCorrect'
+                        break
+                    }
+
+                    default { $result.PublishResult = 'FailUnknownError'; break }
                 }
 
-                '*The name or password was not correct!*'
-                {
-                    Write-Verbose 'The name or password was not correct!'
-                    $result.PublishResult = 'FailNameOrPasswordWasNotCorrect'
-                    break
-                }
-
-                default { $result.PublishResult = 'FailUnknownError'; break }
+                Write-Output $result
             }
-
-            Write-Output $result
+            else
+            {
+                throw "Failed to publish image `"$ImageUrl`"; something went wrong while invoking the Asaph post page, because the response is empty."
+            }
         }
-        else
+        catch
         {
-            throw "Failed to publish image `"$ImageUrl`"; something went wrong while invoking the Asaph post page, because the response is empty."
+            throw "Failed to publish image `"$ImageUrl`" to Asaph site `"$AsaphUrl`": $($_.Exception.Message)"
         }
     }
-    catch
-    {
-        throw "Failed to publish image `"$ImageUrl`" to Asaph site `"$AsaphUrl`": $($_.Exception.Message)"
-    }
-
 
 <#
 .SYNOPSIS

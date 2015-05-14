@@ -36,7 +36,7 @@ It's short for *Dramatic Development*, my coding brand.
 ## Installation ##
 Open a PowerShell command box and run the following command to install this module straight from the GitHub repository to the WindowsPowerShell\Modules folder in the MyDocuments of your Windows user profile:
 
-    iex (New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/victorvogelpoel/Dramatic.Asaph/master/install.ps1')
+    iex (New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/victorvogelpoel/Dramatic.Asaph/master/install/install.ps1')
 
 
 ## Features ##

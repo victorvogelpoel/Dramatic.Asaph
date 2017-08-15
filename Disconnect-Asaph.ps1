@@ -21,14 +21,17 @@ function Disconnect-Asaph
     [CmdletBinding()]
     param
     (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true)]
         [Alias('Url')]
         [Uri]$AsaphUrl
     )
 
-    $asaphUrlText	= $AsaphUrl.ToString().TrimEnd('/', ' ')
-    $asaphAdminUri	= [Uri]"$asaphUrlText/admin/"
+    process
+    {
+        $asaphUrlText	= $AsaphUrl.ToString().TrimEnd('/', ' ')
+        $asaphAdminUri	= [Uri]"$asaphUrlText/admin/"
 
-    # Remove the cached token for the specified site
-    $script:AsaphLoginTokens.Remove($asaphUrlText)
+        # Remove the cached token for the specified site
+        $script:AsaphLoginTokens.Remove($asaphUrlText)
+    }
 }

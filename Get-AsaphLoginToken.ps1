@@ -12,31 +12,37 @@ function Get-AsaphLoginToken
     [CmdletBinding()]
     param
     (
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$false, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true)]
         [Alias('Url')]
         [Uri]$AsaphUrl
     )
 
-    if ($null -ne $AsaphUrl)
+    process
     {
-        $AsaphUrlText  = $AsaphUrl.ToString().TrimEnd('/', ' ')
-
-        if (!($script:AsaphLoginTokens.ContainsKey($AsaphUrlText)))
+        if ($null -ne $AsaphUrl)
         {
-            # Cannot find login token for `"$AsaphUrl`"
-            throw "Asaph site `"$AsaphUrl`" is not yet connected; please use Connect-Asaph to logon to this Asaph site first."
+            # Find the cashed login token for the url
+            $AsaphUrlText  = $AsaphUrl.ToString().TrimEnd('/', ' ')
+
+            if (!($script:AsaphLoginTokens.ContainsKey($AsaphUrlText)))
+            {
+                # Cannot find login token for `"$AsaphUrl`"
+                throw "Asaph site `"$AsaphUrl`" is not yet connected; please use Connect-Asaph to logon to this Asaph site first."
+            }
+
+            # Token is "cookieName:token, eg "asaphAdmin:827f41be9ea7d435044ca5397f4b20fb"
+            return $script:AsaphLoginTokens[$AsaphUrlText]
         }
-
-        return $script:AsaphLoginTokens[$AsaphUrlText].ToString()
-    }
-    else
-    {
-        # The $script:AsaphLoginTokens should contain exactly 1 token.
-        switch ($script:AsaphLoginTokens.Count)
+        else
         {
-            0		{ throw 'No Asaph sites are connected. Please use Connect-Asaph to logon to Asaph first.'; break }
-            1		{ $script:AsaphLoginTokens.Values[0]; break}
-            default	{ throw 'Multiple Asaph sites are connected. Please specify the Asaph URL.'; break }
+            # No Url was specified. Return the (only) token.
+            # The $script:AsaphLoginTokens should contain exactly 1 token.
+            switch ($script:AsaphLoginTokens.Count)
+            {
+                0		{ throw 'No Asaph sites are connected. Please use Connect-Asaph to logon to Asaph first.'; break }
+                1		{ $script:AsaphLoginTokens.Values[0]; break}
+                default	{ throw 'Multiple Asaph sites are connected. Please specify the Asaph URL.'; break }
+            }
         }
     }
 }

@@ -41,23 +41,25 @@ function Publish-AsaphImage
 
     process
     {
-        # Make sure we're logged on to the Asaph site; Connect-Asaph must have been used
+        # Make sure we're logged on to the Asaph site; 'Connect-Asaph' must have been used
         #Assert-AsaphLoggedOn -AsaphUrl $AsaphUrl
-
-        # Get the Logon token from the local cache
-        $logonToken 	= Get-AsaphLoginToken -AsaphUrl $AsaphUrl
 
         if ($null -eq $AsaphUrl)
         {
             $AsaphUrl 	= [Uri][string]($script:AsaphLoginTokens.Keys[0])
         }
 
+        # Get the Logon token from the local cache
+        $logonCookieToken = Get-AsaphLoginToken -AsaphUrl $AsaphUrl
+
         $AsaphUrlText 	= $AsaphUrl.ToString().TrimEnd('/', ' ')
         $asaphAdminUri	= [Uri]"$AsaphUrlText/admin"
         $asaphPostUri	= [Uri]"$AsaphUrlText/admin/post.php"
 
-        #$cookieName = "$($AsaphUrl.Segments | select -Last 1)Admin"  # get the directory name of the asaph installation, which is the cookieName + "Admin"
-        $cookieName     = "asaphAdmin"
+        # Token is "cookieName:token", eg "asaphAdmin:827f41be9ea7d435044ca5397f4b20fb"
+        $tokenSplit     = $logonCookieToken -split ':'
+        $cookieName     = $tokenSplit[0]
+        $logonToken     = $tokenSplit[1]
         $loginCookie	= New-Object System.Net.Cookie($cookieName, $logonToken, $asaphPostUri.AbsolutePath, $asaphPostUri.Host)
 
         # Now prepare the login cookie for the request

@@ -36,6 +36,11 @@ function Connect-Asaph
         [Alias('Token', 'LogonToken')]
         [string]$AsaphLoginToken,
 
+        [Parameter(Mandatory=$false, ParameterSetName='Credential', helpmessage='Name of the cookie to contain the login token; default: ''AsaphAdmin''.')]
+        [Parameter(Mandatory=$false, ParameterSetName='Token', helpmessage='Name of the cookie to contain the login token; default: ''AsaphAdmin''.')]
+        [ValidateNotNullOrEmpty()]
+        [string]$CookieName = 'asaphAdmin',
+
         [Parameter(Mandatory=$false, helpmessage='Return the logon token. For example, you may wish to store the login token for later use.')]
         [switch]$Passthru
     )
@@ -74,28 +79,23 @@ function Connect-Asaph
             throw "Incorrect name or password while attempting logging on to Asaph site at `"$asaphUrlText`""
         }
 
-        #$cookieName = "$($AsaphUrl.Segments | select -Last 1)Admin"  # get the directory name of the asaph installation, which is the cookieName + "Admin"
-        $cookieName = 'asaphAdmin'
-        $cookie     = $loginsession.Cookies.GetCookies($asaphAdminUri)[$cookieName]
-        if ($null -eq $cookie)
+        $cookie     = $loginsession.Cookies.GetCookies($asaphAdminUri)[$CookieName]
+        if ($null -eq $cookie -or $null -eq $cookie.Value)
         {
             throw "Missing logon token cookie in logon response at Asaph site $asaphUrlText"
         }
 
-        $asaphLoginTokenFromCookie = $cookie.Value
-        if ($null -eq $asaphLoginTokenFromCookie)
-        {
-            throw "Missing logon token cookie in logon response at Asaph site $asaphUrlText"
-        }
+        $asaphLoginTokenFromCookie              = $cookie.Value
 
-        $script:AsaphLoginTokens[$asaphUrlText]	= $asaphLoginTokenFromCookie
+        # URL->"asaphAdmin:827f41be9ea7d435044ca5397f4b20fb"
+        $script:AsaphLoginTokens[$asaphUrlText]	= "$CookieName`:$asaphLoginTokenFromCookie"
         $AsaphLoginToken                        = $asaphLoginTokenFromCookie
     }
     else
     {
         # A token was specified. Ensure validity.
 
-        $loginCookie	= New-Object System.Net.Cookie('asaphAdmin', $AsaphLoginToken, $asaphPostUri.AbsolutePath, $asaphPostUri.Host)
+        $loginCookie	= New-Object System.Net.Cookie($CookieName, $AsaphLoginToken, $AsaphUrl.AbsolutePath, $AsaphUrl.Host)
 
         # Now prepare the login cookie for the request
         $cc				= New-Object System.Net.CookieContainer 
@@ -117,12 +117,13 @@ function Connect-Asaph
             throw "Failed to login into Asaph with specified logon token; please log on with credentials (instead of token)."
         }
 
-		# Cache the token in memory
-        $script:AsaphLoginTokens[$asaphUrlText] = $AsaphLoginToken
+		# Cache the token in memory  URL->"asaphAdmin:827f41be9ea7d435044ca5397f4b20fb"
+        $script:AsaphLoginTokens[$asaphUrlText] = "$CookieName`:$AsaphLoginToken"
     }
 
     if ($Passthru)
     {
+        # Return the loginToken, eg "827f41be9ea7d435044ca5397f4b20fb"
         Write-Output $AsaphLoginToken
     }
 
@@ -146,6 +147,11 @@ function Connect-Asaph
     Login token to use to log into the Asaph site.
     You may have saved the token from an earlier session and want to reuse it.
 
+.PARAMETER CookieName
+    Name of the cookie to contain the login token; default: ''AsaphAdmin''
+    Some Asaph implementations run on the same domain and can't use the same cookiename.
+    You can set the Asaph cookie name in lib\asaph_admin.class.php.
+    
 .PARAMETER Passthru
     Return the logon token. For example, you may wish to store the login token
     for later use.

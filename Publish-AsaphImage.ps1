@@ -56,7 +56,8 @@ function Publish-AsaphImage
         $asaphAdminUri	= [Uri]"$AsaphUrlText/admin"
         $asaphPostUri	= [Uri]"$AsaphUrlText/admin/post.php"
 
-        $cookieName = "$($AsaphUrl.Segments | select -Last 1)Admin"  # get the directory name of the asaph installation, which is the cookieName + "Admin"
+        #$cookieName = "$($AsaphUrl.Segments | select -Last 1)Admin"  # get the directory name of the asaph installation, which is the cookieName + "Admin"
+        $cookieName     = "asaphAdmin"
         $loginCookie	= New-Object System.Net.Cookie($cookieName, $logonToken, $asaphPostUri.AbsolutePath, $asaphPostUri.Host)
 
         # Now prepare the login cookie for the request
